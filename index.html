@@ -1,13 +1,212 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur Optibox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-black { font-weight: 900; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
 
+    <div class="flex flex-col h-screen w-full overflow-hidden">
+        <!-- Header -->
+        <header class="h-16 px-8 flex items-center border-b bg-white shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-2.035-2.615A1 1 0 0 0 17.02 9.5H15"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-800 uppercase">Calculateur Optibox</h1>
+            </div>
+            <div class="ml-auto text-[10px] font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded uppercase tracking-[0.1em]">Expert Mode Active</div>
+        </header>
+
+        <main class="flex-1 flex overflow-hidden">
+            <!-- Side Panel: Configuration -->
+            <aside class="w-80 border-r bg-white p-8 flex flex-col gap-8 shadow-sm shrink-0">
+                <section>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">Saisie des Articles</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold flex justify-between">
+                                <span>Demi-module</span>
+                                <span class="text-indigo-600 font-bold">72/pal</span>
+                            </label>
+                            <input type="number" id="qty1" value="1500" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:ring-0 outline-none transition-all text-lg font-bold">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold flex justify-between">
+                                <span>Plaques périph.</span>
+                                <span class="text-indigo-600 font-bold">212/pal</span>
+                            </label>
+                            <input type="number" id="qty2" value="3200" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:ring-0 outline-none transition-all text-lg font-bold">
+                        </div>
+                    </div>
+                </section>
+
+                <button onclick="calculate()" class="mt-auto w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-indigo-200 transition-all active:scale-95">
+                    CALCULER LES BESOINS
+                </button>
+            </aside>
+
+            <!-- Main Content: Dashboard -->
+            <div class="flex-1 p-8 flex flex-col gap-8 overflow-y-auto bg-slate-50">
+                <!-- Primary Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Palettes</span>
+                        <div class="flex items-baseline gap-2 mt-4">
+                            <span id="res-totalPallets" class="text-6xl font-black text-slate-900 leading-none">--</span>
+                            <span class="text-lg font-bold text-slate-300 uppercase">Units</span>
+                        </div>
+                        <div class="mt-4 text-sm text-slate-500 italic">Arrondi à l'unité supérieure</div>
+                    </div>
+
+                    <div class="bg-indigo-600 p-6 rounded-3xl shadow-lg shadow-indigo-100 flex flex-col text-white">
+                        <span class="text-xs font-bold text-indigo-200 uppercase tracking-widest">Besoin Camions</span>
+                        <div class="flex items-baseline gap-2 mt-4">
+                            <span id="res-trucks" class="text-6xl font-black leading-none">--</span>
+                            <span class="text-lg font-bold text-indigo-300 uppercase">Trks</span>
+                        </div>
+                        <div class="mt-4 text-sm text-indigo-200">Arrondi à l'unité supérieure</div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Poids Total</span>
+                        <div class="flex items-baseline gap-2 mt-4">
+                            <span id="res-weight" class="text-6xl font-black text-slate-900 leading-none">--</span>
+                            <span class="text-lg font-bold text-slate-300 uppercase">Kg</span>
+                        </div>
+                        <div class="mt-4 text-sm text-slate-500">Densités articles réelles</div>
+                    </div>
+                </div>
+
+                <!-- Secondary Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <!-- Loading Details (Left) -->
+                    <div class="bg-slate-900 p-8 rounded-3xl shadow-2xl flex flex-col text-white">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">Détails du Chargement</h3>
+                        <div class="space-y-6 flex-1">
+                            <div class="flex justify-between items-center py-4 border-b border-slate-800">
+                                <span class="text-slate-400">palettes demi-module</span>
+                                <span id="det-pal1" class="font-mono font-bold text-lg">0</span>
+                            </div>
+                            <div class="flex justify-between items-center py-4 border-b border-slate-800">
+                                <span class="text-slate-400">palettes plaques périph.</span>
+                                <span id="det-pal2" class="font-mono font-bold text-lg">0</span>
+                            </div>
+                            <div class="flex justify-between items-center py-4 border-b border-slate-800">
+                                <span class="text-slate-400">Volume Total</span>
+                                <span id="det-vol" class="font-mono font-bold text-lg">0.000 m³</span>
+                            </div>
+                        </div>
+                        <div class="mt-8 p-4 bg-slate-800 rounded-xl">
+                            <div class="text-[10px] text-indigo-400 mb-1 font-bold uppercase tracking-widest">Alerte Capacité</div>
+                            <div class="text-sm text-slate-300 italic">Optimisation basée sur remorque standard (22 pal.)</div>
+                        </div>
+                    </div>
+
+                    <!-- Volume Chart (Right) -->
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col">
+                        <div class="flex justify-between items-center mb-8">
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Charge Volumétrique</h3>
+                            <div class="bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                                <span id="res-lastTruckBadge" class="text-[10px] font-black text-indigo-600 uppercase tracking-tighter">--</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center justify-center gap-6">
+                            <div class="relative w-full h-40 bg-slate-100 rounded-2xl overflow-hidden shadow-inner border border-slate-200">
+                                <div id="fill-bar" class="absolute bottom-0 left-0 w-full bg-indigo-500 transition-all duration-700 ease-out" style="height: 0%"></div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="res-ratio" class="text-4xl font-black text-slate-900 drop-shadow-sm">0.000</span>
+                                    <span class="text-xl font-bold text-slate-400 ml-2 italic">m³/trk</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-[11px] font-bold text-indigo-500 uppercase tracking-widest" id="res-lastTruckPallets">--</p>
+                            </div>
+
+                            <!-- Icons -->
+                            <div id="truck-icons" class="flex flex-wrap gap-2 justify-center pt-4 border-t border-slate-50 w-full">
+                                <!-- Icons injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const PRODUCTS = {
+            DEMI_MODULE: { unitsPerPallet: 72, weight: 10, volume: 0.2376 },
+            PLAQUES: { unitsPerPallet: 212, weight: 2.1, volume: 0 }
+        };
+        const TRUCK_CAP = 22;
+
+        function calculate() {
+            const q1 = parseFloat(document.getElementById('qty1').value) || 0;
+            const q2 = parseFloat(document.getElementById('qty2').value) || 0;
+
+            // Palettes par article (arrondies au supérieur pour les détails comme demandé)
+            const pal1 = Math.ceil(q1 / PRODUCTS.DEMI_MODULE.unitsPerPallet);
+            const pal2 = Math.ceil(q2 / PRODUCTS.PLAQUES.unitsPerPallet);
+
+            // Total palettes cumulé et arrondi
+            const totalPalRaw = (q1 / PRODUCTS.DEMI_MODULE.unitsPerPallet) + (q2 / PRODUCTS.PLAQUES.unitsPerPallet);
+            const totalPalRounded = Math.ceil(totalPalRaw);
+
+            // Besoins camions (arrondis au supérieur)
+            const truckCount = Math.ceil(totalPalRounded / TRUCK_CAP);
+            
+            // Poids et Volume
+            const weightTotal = (q1 * PRODUCTS.DEMI_MODULE.weight) + (q2 * PRODUCTS.PLAQUES.weight);
+            const volumeTotal = (q1 * PRODUCTS.DEMI_MODULE.volume) + (q2 * PRODUCTS.PLAQUES.volume);
+            
+            // Ratio (basé sur le nombre de camions réels)
+            const ratio = truckCount > 0 ? (volumeTotal / truckCount).toFixed(3) : "0.000";
+
+            // Calcul dernier camion
+            const palletsInLastTruckRaw = totalPalRounded % TRUCK_CAP;
+            const palletsInLastTruck = (palletsInLastTruckRaw === 0 && totalPalRounded > 0) ? TRUCK_CAP : palletsInLastTruckRaw;
+            const lastFillRate = Math.round((palletsInLastTruck / TRUCK_CAP) * 100);
+
+            // Mise à jour UI
+            document.getElementById('res-totalPallets').textContent = totalPalRounded;
+            document.getElementById('res-trucks').textContent = truckCount;
+            document.getElementById('res-weight').textContent = Math.round(weightTotal).toLocaleString();
+            document.getElementById('res-ratio').textContent = ratio;
+            
+            document.getElementById('det-pal1').textContent = pal1;
+            document.getElementById('det-pal2').textContent = pal2;
+            document.getElementById('det-vol').textContent = volumeTotal.toFixed(3) + ' m³';
+
+            document.getElementById('res-lastTruckBadge').textContent = truckCount > 0 ? `${truckCount}ème camion : ${lastFillRate}%` : '--';
+            document.getElementById('res-lastTruckPallets').textContent = truckCount > 0 ? `Le ${truckCount}ème camion contient ${palletsInLastTruck} palettes` : '--';
+
+            // Animation de la barre (ratio visuel basé sur 35m3 arbitraire pour le look)
+            const fillVisual = truckCount > 0 ? Math.min((volumeTotal / (truckCount * 35)) * 100, 100) : 0;
+            document.getElementById('fill-bar').style.height = fillVisual + '%';
+
+            // Icônes Camions
+            const container = document.getElementById('truck-icons');
+            container.innerHTML = '';
+            for(let i=0; i < truckCount; i++) {
+                const div = document.createElement('div');
+                div.className = "w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg shadow-sm border border-indigo-100";
+                div.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-2.035-2.615A1 1 0 0 0 17.02 9.5H15"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`;
+                container.appendChild(div);
+            }
+        }
+
+        // Lancement initial
+        window.onload = calculate;
+    </script>
+</body>
+</html>
